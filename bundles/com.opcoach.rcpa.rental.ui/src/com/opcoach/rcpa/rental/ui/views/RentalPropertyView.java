@@ -4,6 +4,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -17,6 +23,8 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.opcoach.rcpa.rental.core.RentalCoreActivator;
 import com.opcoach.rcpa.rental.ui.Messages;
+import com.opcoach.rcpa.rental.ui.RentalUIActivator;
+import com.opcoach.rcpa.rental.ui.RentalUIConstants;
 import com.opcoach.training.rental.Rental;
 import com.opcoach.training.rental.RentalAgency;
 
@@ -46,6 +54,26 @@ public class RentalPropertyView extends ViewPart implements ISelectionListener {
 		gd.horizontalSpan = 2;
 		gd.horizontalAlignment = SWT.FILL;
 		rentedObjectLabel.setLayoutData(gd);
+
+		DragSource ds = new DragSource(rentedObjectLabel, DND.DROP_COPY);
+		ds.setTransfer(new Transfer[] { TextTransfer.getInstance() });
+		ds.addDragListener(new DragSourceAdapter()
+			{
+				public void dragSetData(DragSourceEvent event)
+				{
+					if (TextTransfer.getInstance().isSupportedType(event.dataType))
+					{
+						event.data = rentedObjectLabel.getText();
+					}
+				}
+
+				@Override
+				public void dragStart(DragSourceEvent event)
+				{
+					event.image = RentalUIActivator.getDefault().getImageRegistry().get(RentalUIConstants.IMG_AGENCY);
+				}
+
+			});
 
 		customerTitle = new Label(infoGroup, SWT.NONE);
 		customerTitle.setText(Messages.RentalPropertyView_RentedBy);
