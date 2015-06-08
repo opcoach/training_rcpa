@@ -33,7 +33,7 @@ public class RentalPrefInit extends AbstractPreferenceInitializer implements Ren
 		
 		
 		// Init the default palette with its ID
-		ps.setDefault(PREF_PALETTE, "com.opcoach.rcpa.rental.ui.nonePalette");
+		ps.setDefault(PREF_PALETTE, "com.opcoach.rcpa.rental.ui.default");
 
 		
 	}

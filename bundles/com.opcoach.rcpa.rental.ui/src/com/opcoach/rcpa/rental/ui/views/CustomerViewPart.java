@@ -28,22 +28,17 @@ import com.opcoach.training.rental.Customer;
 import com.opcoach.training.rental.RentalPackage.Literals;
 import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 
-public class CustomerViewPart extends ViewPart implements ISelectionListener
-{
-	private DataBindingContext m_bindingContext;
+public class CustomerViewPart extends ViewPart implements ISelectionListener {
 
 	public static final String ID = "com.opcoach.rcpa.rental.ui.views.CustomerViewPart"; //$NON-NLS-1$
 	private Text txtAName;
 	private Text txtUnPrnom;
-	private Customer currentCustomer;
 
-	public CustomerViewPart()
-	{
+	public CustomerViewPart() {
 	}
 
 	@Override
-	public void init(IViewSite site) throws PartInitException
-	{
+	public void init(IViewSite site) throws PartInitException {
 		super.init(site);
 		site.getPage().addSelectionListener(this);
 	}
@@ -54,8 +49,7 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener
 	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
 	 */
 	@Override
-	public void dispose()
-	{
+	public void dispose() {
 		getSite().getPage().removeSelectionListener(this);
 		super.dispose();
 	}
@@ -66,8 +60,7 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener
 	 * @param parent
 	 */
 	@Override
-	public void createPartControl(Composite parent)
-	{
+	public void createPartControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new FormLayout());
 
@@ -82,25 +75,30 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener
 		grpIdentity.setLayout(new GridLayout(2, false));
 
 		Label label = new Label(grpIdentity, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false, 2, 1));
+		label.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false,
+				2, 1));
 		label.setText("display Name");
 		label.setAlignment(SWT.CENTER);
 
 		Label lblNom = new Label(grpIdentity, SWT.NONE);
-		lblNom.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNom.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
+				1, 1));
 		lblNom.setText("Nom : ");
 
 		txtAName = new Text(grpIdentity, SWT.BORDER);
 		txtAName.setText("A name");
-		txtAName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtAName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
+				1, 1));
 
 		Label lblPrnom = new Label(grpIdentity, SWT.NONE);
-		lblPrnom.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblPrnom.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
+				false, 1, 1));
 		lblPrnom.setText("Pr\u00E9nom");
 
 		txtUnPrnom = new Text(grpIdentity, SWT.BORDER);
 		txtUnPrnom.setText("Un pr\u00E9nom");
-		txtUnPrnom.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		txtUnPrnom.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
 
 		Group grpAdresse = new Group(container, SWT.NONE);
 		grpAdresse.setText("Adresse");
@@ -117,21 +115,12 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener
 
 	}
 
-	public void setCustomer(Customer c)
-	{
-		currentCustomer = c;
-		if (m_bindingContext != null)
-		{
-			m_bindingContext.dispose();
-			m_bindingContext = null;
-		}
-		
-		if (c != null)
-		{
-			m_bindingContext = initDataBindings();
-		}
-		else
-		{
+	public void setCustomer(Customer c) {
+
+		if (c != null) {
+			txtAName.setText(c.getLastName());
+			txtUnPrnom.setText(c.getFirstName());
+		} else {
 			// Fill with default
 			txtAName.setText(" ");
 			txtUnPrnom.setText(" ");
@@ -146,18 +135,17 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener
 	 * IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
 	 */
 	@Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection)
-	{
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (selection.isEmpty())
 			return;
 
-		if (selection instanceof IStructuredSelection)
-		{
+		if (selection instanceof IStructuredSelection) {
 			Object sel = ((IStructuredSelection) selection).getFirstElement();
 
 			// La selection courante est elle un Customer ou adaptable en
 			// Customer ?
-			Customer c = (Customer) Platform.getAdapterManager().getAdapter(sel, Customer.class);
+			Customer c = (Customer) Platform.getAdapterManager().getAdapter(
+					sel, Customer.class);
 			setCustomer(c);
 
 		}
@@ -165,21 +153,9 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener
 	}
 
 	@Override
-	public void setFocus()
-	{
+	public void setFocus() {
 		// Set the focus
 	}
-	protected DataBindingContext initDataBindings() {
-		DataBindingContext bindingContext = new DataBindingContext();
-		//
-		IObservableValue observeTextTxtANameObserveWidget = WidgetProperties.text(SWT.Modify).observe(txtAName);
-		IObservableValue currentCustomerLastNameObserveValue = EMFObservables.observeValue(currentCustomer, Literals.CUSTOMER__LAST_NAME);
-		bindingContext.bindValue(observeTextTxtANameObserveWidget, currentCustomerLastNameObserveValue, null, new EMFUpdateValueStrategy());
-		//
-		IObservableValue observeTextTxtUnPrnomObserveWidget = WidgetProperties.text(SWT.Modify).observe(txtUnPrnom);
-		IObservableValue currentCustomerFirstNameObserveValue = EMFObservables.observeValue(currentCustomer, Literals.CUSTOMER__FIRST_NAME);
-		bindingContext.bindValue(observeTextTxtUnPrnomObserveWidget, currentCustomerFirstNameObserveValue, null, new EMFUpdateValueStrategy());
-		//
-		return bindingContext;
-	}
+
+	
 }

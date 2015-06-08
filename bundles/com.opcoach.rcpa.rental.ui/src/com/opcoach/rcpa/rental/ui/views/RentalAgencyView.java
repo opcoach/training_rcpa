@@ -116,11 +116,6 @@ public class RentalAgencyView extends ViewPart implements IPropertyChangeListene
 		agencyViewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuManager, agencyViewer);
 
-		// L'arbre est draggable
-		DragSource ds = new DragSource(agencyViewer.getControl(), DND.DROP_COPY);
-		Transfer[] ts = new Transfer[] { TextTransfer.getInstance(), RTFTransfer.getInstance(), URLTransfer.getInstance() };
-		ds.setTransfer(ts);
-		ds.addDragListener(new AgencyTreeDragSourceListener(agencyViewer));
 
 		getSite().setSelectionProvider(agencyViewer);
 

@@ -18,12 +18,7 @@ public class Application implements IApplication {
 	 */
 	public Object start(IApplicationContext context) throws Exception {
 		Display display = PlatformUI.createDisplay();
-		
-		Shell s = new Shell(display, SWT.TITLE);
-		LoginDialog ld = new LoginDialog(s);
-		if (!ld.authenticate())
-			return IApplication.EXIT_OK;
-		
+			
 		try {
 			int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
 			if (returnCode == PlatformUI.RETURN_RESTART)
