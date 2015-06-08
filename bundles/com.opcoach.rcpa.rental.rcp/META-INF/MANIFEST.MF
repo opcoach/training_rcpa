@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Rental RCP Advanced Application
+Bundle-SymbolicName: com.opcoach.rcpa.rental.rcp;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: OPCOACH
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ com.opcoach.rcpa.rental.ui;bundle-version="1.0.1"
+Bundle-ActivationPolicy: lazy
