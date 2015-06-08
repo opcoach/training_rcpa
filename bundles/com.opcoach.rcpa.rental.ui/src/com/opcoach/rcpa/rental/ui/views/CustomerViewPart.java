@@ -4,6 +4,7 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.databinding.EMFObservables;
+import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,14 +27,16 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.opcoach.training.rental.Customer;
 import com.opcoach.training.rental.RentalPackage.Literals;
-import org.eclipse.emf.databinding.EMFUpdateValueStrategy;
 
 public class CustomerViewPart extends ViewPart implements ISelectionListener {
+
+	private DataBindingContext m_bindingContext;
 
 	public static final String ID = "com.opcoach.rcpa.rental.ui.views.CustomerViewPart"; //$NON-NLS-1$
 	private Text txtAName;
 	private Text txtUnPrnom;
 
+	private Customer currentCustomer;
 	public CustomerViewPart() {
 	}
 
@@ -115,12 +118,21 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener {
 
 	}
 
-	public void setCustomer(Customer c) {
-
-		if (c != null) {
-			txtAName.setText(c.getLastName());
-			txtUnPrnom.setText(c.getFirstName());
-		} else {
+	public void setCustomer(Customer c)
+	{
+		currentCustomer = c;
+		if (m_bindingContext != null)
+		{
+			m_bindingContext.dispose();
+			m_bindingContext = null;
+		}
+		
+		if (c != null)
+		{
+			m_bindingContext = initDataBindings();
+		}
+		else
+		{
 			// Fill with default
 			txtAName.setText(" ");
 			txtUnPrnom.setText(" ");
@@ -156,6 +168,19 @@ public class CustomerViewPart extends ViewPart implements ISelectionListener {
 	public void setFocus() {
 		// Set the focus
 	}
-
 	
+	protected DataBindingContext initDataBindings() {
+		DataBindingContext bindingContext = new DataBindingContext();
+		//
+		IObservableValue observeTextTxtANameObserveWidget = WidgetProperties.text(SWT.Modify).observe(txtAName);
+		IObservableValue currentCustomerLastNameObserveValue = EMFObservables.observeValue(currentCustomer, Literals.CUSTOMER__LAST_NAME);
+		bindingContext.bindValue(observeTextTxtANameObserveWidget, currentCustomerLastNameObserveValue, null, new EMFUpdateValueStrategy());
+		//
+		IObservableValue observeTextTxtUnPrnomObserveWidget = WidgetProperties.text(SWT.Modify).observe(txtUnPrnom);
+		IObservableValue currentCustomerFirstNameObserveValue = EMFObservables.observeValue(currentCustomer, Literals.CUSTOMER__FIRST_NAME);
+		bindingContext.bindValue(observeTextTxtUnPrnomObserveWidget, currentCustomerFirstNameObserveValue, null, new EMFUpdateValueStrategy());
+		//
+		return bindingContext;
+	}
+
 }

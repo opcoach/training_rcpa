@@ -1,6 +1,15 @@
 package com.opcoach.rcpa.rental.ui.views;
 
+import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.beans.PojoProperties;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.internal.databinding.conversion.DateToStringConverter;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.emf.databinding.EMFObservables;
+import org.eclipse.emf.databinding.EMFProperties;
+import org.eclipse.emf.databinding.FeaturePath;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -27,9 +36,12 @@ import com.opcoach.rcpa.rental.ui.RentalUIActivator;
 import com.opcoach.rcpa.rental.ui.RentalUIConstants;
 import com.opcoach.training.rental.Rental;
 import com.opcoach.training.rental.RentalAgency;
+import com.opcoach.training.rental.RentalPackage.Literals;
 
 public class RentalPropertyView extends ViewPart implements ISelectionListener {
 	public static final String VIEW_ID = "com.opcoach.rental.ui.views.rentalView"; //$NON-NLS-1$
+
+	private DataBindingContext m_bindingContext;
 
 	private Label rentedObjectLabel;
 	private Label customerNameLabel;
@@ -37,6 +49,9 @@ public class RentalPropertyView extends ViewPart implements ISelectionListener {
 	private Label endDateLabel;
 
 	private Label customerTitle;
+	
+	private Rental currentRental;
+
 
 	public RentalPropertyView() {
 	}
@@ -94,6 +109,7 @@ public class RentalPropertyView extends ViewPart implements ISelectionListener {
 		// Fill with sample
 		RentalAgency agency = RentalCoreActivator.getAgency();
 		setRental(agency.getRentals().get(0));
+		m_bindingContext = initDataBindings();
 
 		// Initialize binding
 		// m_bindingContext = initDataBindings();
@@ -102,16 +118,20 @@ public class RentalPropertyView extends ViewPart implements ISelectionListener {
 
 	public void setRental(Rental r) {
 
+		currentRental = r;
+
+		if (m_bindingContext != null)
+		{
+			m_bindingContext.dispose();
+			m_bindingContext = null;
+		}
+		
 		if (r == null) {
 			rentedObjectLabel.setText(" ");
 			customerNameLabel.setText(" ");
 			startDateLabel.setText(" ");
 			endDateLabel.setText(" ");
-		} else {
-			rentedObjectLabel.setText(r.getRentedObject().getName());
-			customerNameLabel.setText(r.getCustomer().getDisplayName());
-			startDateLabel.setText(r.getStartDate().toString());
-			endDateLabel.setText(r.getEndDate().toString());
+		} else {			m_bindingContext = initDataBindings();
 
 		}
 
@@ -160,6 +180,31 @@ public class RentalPropertyView extends ViewPart implements ISelectionListener {
 
 		}
 
+	}
+	protected DataBindingContext initDataBindings() {
+		DataBindingContext bindingContext = new DataBindingContext();
+		//
+		IObservableValue observeTextRentedObjectLabelObserveWidget = WidgetProperties.text().observe(rentedObjectLabel);
+		IObservableValue currentRentalNameObserveValue = EMFProperties.value(FeaturePath.fromList(Literals.RENTAL__RENTED_OBJECT, Literals.RENTAL_OBJECT__NAME)).observe(currentRental);
+		bindingContext.bindValue(observeTextRentedObjectLabelObserveWidget, currentRentalNameObserveValue, null, null);
+		//
+		IObservableValue observeTextStartDateLabelObserveWidget = WidgetProperties.text().observe(startDateLabel);
+		IObservableValue startDateCurrentRentalObserveValue = PojoProperties.value("startDate").observe(currentRental);
+		UpdateValueStrategy strategy = new UpdateValueStrategy();
+		strategy.setConverter(new DateToStringConverter());
+		bindingContext.bindValue(observeTextStartDateLabelObserveWidget, startDateCurrentRentalObserveValue, null, strategy);
+		//
+		IObservableValue observeTextEndDateLabelObserveWidget = WidgetProperties.text().observe(endDateLabel);
+		IObservableValue currentRentalEndDateObserveValue = EMFObservables.observeValue(currentRental, Literals.RENTAL__END_DATE);
+		UpdateValueStrategy strategy_1 = new UpdateValueStrategy();
+		strategy_1.setConverter(new DateToStringConverter());
+		bindingContext.bindValue(observeTextEndDateLabelObserveWidget, currentRentalEndDateObserveValue, null, strategy_1);
+		//
+		IObservableValue observeTextCustomerNameLabelObserveWidget = WidgetProperties.text().observe(customerNameLabel);
+		IObservableValue customerdisplayNameCurrentRentalObserveValue = PojoProperties.value("customer.displayName").observe(currentRental);
+		bindingContext.bindValue(observeTextCustomerNameLabelObserveWidget, customerdisplayNameCurrentRentalObserveValue, null, null);
+		//
+		return bindingContext;
 	}
 
 }
