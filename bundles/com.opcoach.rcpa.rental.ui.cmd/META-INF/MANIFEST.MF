@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cmd
+Bundle-SymbolicName: com.opcoach.rcpa.rental.ui.cmd;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: OPCOACH
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.expressions,
+ com.opcoach.rcpa.rental.core;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
